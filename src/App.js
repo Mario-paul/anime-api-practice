@@ -4,9 +4,9 @@ import Sidebar from "./components/Sidebar";
 import MainContent from "./components/MainContent";
 
 function App() {
-  const  [animeList, SetAnimeList]  = useState([]);
-  const  [topAnime, setTopAnime ] = useState([]);
-  const  [search, SetSearch]  = useState("");
+  const [animeList, SetAnimeList] = useState([]);
+  const [topAnime, setTopAnime] = useState([]);
+  const [search, SetSearch] = useState("");
 
   const GetTopAnime = async () => {
     const temp = await fetch(
@@ -16,9 +16,25 @@ function App() {
     setTopAnime(temp.top.slice(0, 5)); // get data in temp and slice the first 5 elements, then put into topAnime
   };
 
+  const HandleSearch = (e) => {
+    e.preventDefault();
+
+    //console.log(search)
+    FetchAnime(search);
+  };
+
+  const FetchAnime = async (query) => {
+    const temp = await fetch(
+      `https://api.jikan.moe/v3/search/anime?q=${query}&order_by=title&sort=asc&limit=10`
+    ).then((res) => res.json());
+
+    //console.log(temp.results);
+
+    SetAnimeList(temp.results);
+  };
+
   useEffect(() => {
     GetTopAnime();
-
   }, []);
   //console.log(topAnime);
 
@@ -27,7 +43,12 @@ function App() {
       <Header />
       <div className="content-wrap">
         <Sidebar topAnime={topAnime} />
-        <MainContent />
+        <MainContent
+          HandleSearch={HandleSearch}
+          search={search}
+          SetSearch={SetSearch}
+          animeList={animeList}
+        />
       </div>
     </div>
   );
